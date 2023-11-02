@@ -46,7 +46,7 @@ plt.ylabel('Probability', fontsize=18)  # Increased fontsize
 plt.title('Normal Velocity Probability Distribution', fontsize=20)  # Increased fontsize
 
 # Adding an annotation inside the plot
-plt.annotate(f'Most Probable Velocity = {mean_Velocity:.1f} m/s', 
+plt.annotate(f'Most Probable Normal Velocity = {mean_Velocity:.1f} m/s', 
              xy=(max(v_values), max(f_values)), 
              xytext=(-10, -50), 
              textcoords='offset points',
@@ -81,9 +81,9 @@ plt.ylabel('Probability', fontsize=18)  # Increased fontsize
 plt.title('Normal Velocity Probability Distribution', fontsize=20)  # Increased fontsize
 
 # Adding an annotation inside the plot
-plt.annotate(f'Most Probable Velocity = {mean_Velocity:.1f} ± {unsteadyV}m/s', 
+plt.annotate(f'Most Probable Normal Velocity = {mean_Velocity:.1f}±{unsteadyV}m/s', 
              xy=(max(v_values), max(f_values)), 
-             xytext=(-10, -60), 
+             xytext=(-8, -60), 
              textcoords='offset points',
              horizontalalignment='right',
              verticalalignment='top',
@@ -111,10 +111,22 @@ third_column_data1 = df1[2]
 third_column_data2 = df2[2]
 # Create a histogram
 plt.figure(figsize=(10, 6))
-plt.hist(third_column_data1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
+# plt.hist(third_column_data1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
 plt.hist(third_column_data2, bins=50,density=True,color='red', edgecolor='black',alpha=0.5, label='Vmin')
 plt.plot(v_values, f_values, label='steady', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
 plt.plot(v_values - unsteadyV, f_values, label='Vmin', linewidth=3, color='red')
+# plt.plot(v_values + unsteadyV, f_values, label='Vmax', linewidth=3, color='blue')
+plt.xlabel('Reflected Normal velocity(m/s)', fontsize=18)  # Increased fontsize
+plt.ylabel('Probability', fontsize=18)  # Increased fontsize
+plt.title('Normal Velocity Probability Distribution', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=14)  # Increased fontsize
+plt.show()
+
+plt.figure(figsize=(10, 6))
+plt.hist(third_column_data1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
+# plt.hist(third_column_data2, bins=50,density=True,color='red', edgecolor='black',alpha=0.5, label='Vmin')
+plt.plot(v_values, f_values, label='steady', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
+# plt.plot(v_values - unsteadyV, f_values, label='Vmin', linewidth=3, color='red')
 plt.plot(v_values + unsteadyV, f_values, label='Vmax', linewidth=3, color='blue')
 plt.xlabel('Reflected Normal velocity(m/s)', fontsize=18)  # Increased fontsize
 plt.ylabel('Probability', fontsize=18)  # Increased fontsize

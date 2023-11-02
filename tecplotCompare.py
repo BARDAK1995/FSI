@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 casename = "case1_half"
-casename = "pm40_new"
+casename = "pm500"
 
-file_path_main = f'./PM_BC2/{casename}.tec'
+file_path_main = f'./PM_BC_november/{casename}.tec'
 # file_path_main31 = f'./Phonic_state_MS2/{casename}_half_modified.tec'
 # file_path_main32 = f'./Phonic_state_MS2/{casename}_modified.tec'
-file_path_ref = './PM_BC2/ref.tec'
-new_file_path = f'./PM_BC2/{casename}_modified.tec'
+file_path_ref = './PM_BC_november/ref.tec'
+new_file_path = f'./PM_BC_november/m_{casename}.tec'
 
 # file_path_ref = f'./Phonic_state_MS4/{casename}_half.tec'
 # new_file_path = f'./Phonic_state_MS4/{casename}_modified_UNSTEADY.tec'
