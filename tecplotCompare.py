@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 casename = "case1_half"
-casename = "pm500"
+casename = "BC_rotate"
 
 file_path_main = f'./PM_BC_november/{casename}.tec'
 # file_path_main31 = f'./Phonic_state_MS2/{casename}_half_modified.tec'
 # file_path_main32 = f'./Phonic_state_MS2/{casename}_modified.tec'
-file_path_ref = './PM_BC_november/ref.tec'
-new_file_path = f'./PM_BC_november/m_{casename}.tec'
+file_path_ref = './PM_BC_november/refnp.tec'
+new_file_path = f'./PM_BC_november/m2_{casename}.tec'
 
 # file_path_ref = f'./Phonic_state_MS4/{casename}_half.tec'
 # new_file_path = f'./Phonic_state_MS4/{casename}_modified_UNSTEADY.tec'
@@ -63,7 +63,7 @@ with open(file_path_main, 'r') as mainFile, open(file_path_ref, 'r') as refFile,
             # ratio_pressure_percent = ((float(mainValues[press_column_index]) - float(refValues[press_column_index])) / ((float(refValues[press_column_index]) + float(mainValues[press_column_index]) +1/100000000000)/2)*100)
             ratio_Rho_percent = ((float(mainValues[Rho_column_index]) - float(refValues[Rho_column_index])) / ((float(refValues[Rho_column_index]) + float(mainValues[Rho_column_index]) +1/100000000000)/2)*100)
             ratio_Ma_percent = abs((float(mainValues[MA_column_index]) - float(refValues[MA_column_index])))
-            ratio_T_percent = abs((float(mainValues[T_column_index]) - float(refValues[T_column_index])) / ((float(refValues[T_column_index]) + float(mainValues[T_column_index]) +1/100000000000)/2)*100)
+            ratio_T_percent = ((float(mainValues[T_column_index]) - float(refValues[T_column_index])) / ((float(refValues[T_column_index]) + float(mainValues[T_column_index]) +1/100000000000)/2)*100)
             
             #refs
             V_ref = float(refValues[V_column_index])

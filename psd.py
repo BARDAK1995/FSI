@@ -5,8 +5,8 @@ import numpy as np
 # Read the file into a DataFrame, assuming space-separated values and no header
 caseName = "CASE1_half"
 # caseName = "CASE2"
-point = 6
-caseName = "PM_40_newprobes"
+point = 3
+caseName = "PM40"
 # caseName = "oscilatingPM50"
 
 file_path = f"./PM_BC_november/{caseName}/Point{str(point)}.dat"
