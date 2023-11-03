@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 casename = "case1_half"
-casename = "BC_rotate"
+casename = "jet4mm3"
 
 file_path_main = f'./PM_BC_november/{casename}.tec'
 # file_path_main31 = f'./Phonic_state_MS2/{casename}_half_modified.tec'
