@@ -6,7 +6,7 @@ import numpy as np
 caseName = "CASE1_half"
 # caseName = "CASE2"
 point = 6
-caseName = "PM_jet4mm"
+caseName = "FACE_rotatePM"
 # caseName = "oscilatingPM50"
 
 file_path = f"./PM_BC_november/{caseName}/Point{str(point)}.dat"
