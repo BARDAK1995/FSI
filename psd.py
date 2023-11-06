@@ -6,7 +6,7 @@ import numpy as np
 caseName = "CASE1_half"
 # caseName = "CASE2"
 point = 6
-caseName = "FACE_rotatePM"
+caseName = "PM_40_newprobes"
 # caseName = "oscilatingPM50"
 
 file_path = f"./PM_BC_november/{caseName}/Point{str(point)}.dat"
@@ -444,7 +444,115 @@ def plotPSD2_100(data, data2, probe):
     plt.yticks(fontsize=20)
     plt.show()
 
+
+def plotPSD2_jetcomp(data, data2, probe):
+    tau = 5.0e-9   
+    fig_xsize = 12
+    indexp = 16 #pressure
+    # index = 10 #xvel
+    # index = 11 #yvel
+    indext = 13 #transtemp
+    indexrho = 9
+    time_step = np.array(data[0]) * tau
+    time_step2 = np.array(data2[0]) * tau
+    # 10vx 11vy 13t 14trot 15tvib 16p
+    data_of_interest = np.array(data[[indexp,indext,indexrho]])
+    data_of_interest2 = np.array(data2[[indexp,indext,indexrho]])
+    cutoff = len(data_of_interest[:,0])//5
+    cutoff2 = len(data_of_interest2[:,0])//5
+    # cutoffTime = cutoff * tau
+    # cutoffTime2 = cutoff2 * tau
+    actual_data = data_of_interest[cutoff:]
+    actual_data2 = data_of_interest2[cutoff2:]
+    cutoff_timesteps = time_step[cutoff:]
+    # cutoff_timesteps2 = time_step2[cutoff2:]
+    asd=9*(10**8)*2*(10**12)
+    # Plot the data
+    plt.figure(figsize=(12, 6))
+    plt.plot(cutoff_timesteps, actual_data[:,0],"blue",linewidth=0.3, linestyle='-')
+    plt.xlabel('Time (s))')
+    plt.ylabel('Pressure (pa)')
+    plt.title('Pressure vs Time')
+    plt.show()
+    # Plot the data
+    plt.figure(figsize=(12, 6))
+    plt.plot(cutoff_timesteps, actual_data[:,1],"red",linewidth=0.3, linestyle='-')
+    plt.xlabel('Time (s))')
+    plt.ylabel('Temperature (K)')
+    plt.title('Temperature vs Time')
+    plt.show()
+    # Plot the data
+    plt.figure(figsize=(12, 6))
+    plt.plot(cutoff_timesteps, actual_data[:,2],"black",linewidth=0.3, linestyle='-')
+    plt.xlabel('Time (s))')
+    plt.ylabel('nparticles (#)')
+    plt.title('nparticles vs Time')
+    plt.show()
+    # # # Detrend the data to make it stationary
+    detrended_data_P = np.array(signal.detrend(actual_data[:,0]))
+    detrended_data2_P = np.array(signal.detrend(actual_data2[:,0]))
+    detrended_data_T = np.array(signal.detrend(actual_data[:,1]))
+    detrended_data2_T = np.array(signal.detrend(actual_data2[:,1]))
+    detrended_data_rho = np.array(signal.detrend(actual_data[:,2]))
+    detrended_data2_rho = np.array(signal.detrend(actual_data2[:,2]))
+    # Calculate the Power Spectral Density using Fast Fourier Transform
+    samplingFreq = 1/tau
+    frequencies, psd_valuesP = signal.welch(detrended_data_P, fs=samplingFreq, nperseg=100000)
+    frequencies2, psd_values2P = signal.welch(detrended_data2_P, fs=samplingFreq, nperseg=100000)
+    frequencies, psd_valuesT = signal.welch(detrended_data_T, fs=samplingFreq, nperseg=100000)
+    frequencies2, psd_values2T = signal.welch(detrended_data2_T, fs=samplingFreq, nperseg=100000)
+    frequencies, psd_valuesRho = signal.welch(detrended_data_rho, fs=samplingFreq, nperseg=100000)
+    frequencies2, psd_values2Rho = signal.welch(detrended_data2_rho, fs=samplingFreq, nperseg=100000)
+    # Plotting the Power Spectral Density
+    plt.figure(figsize=(fig_xsize, 6))
+    plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.title('Pressure PSD', fontsize=22)
+    plt.xlabel('Frequency [kHz]', fontsize=18)
+    plt.ylabel('PSD [P**2/Hz]', fontsize=18)
+    plt.xlim([2*10**1, 2*10**5])
+    # plt.xlim(left=2*10**1)
+    plt.ylim([2*10**-10, 2*10**-4]) # setting y-axis range
+    # plt.ylim(bottom=2*10**-8)
+    plt.legend(fontsize=20)
+    plt.grid(True)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.show()
+    # Plotting the Power Spectral Density
+    plt.figure(figsize=(fig_xsize, 6))
+    plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.title('Translational Temperature PSD', fontsize=22)
+    plt.xlabel('Frequency [kHz]', fontsize=18)
+    plt.ylabel('PSD [T**2/Hz]', fontsize=18)
+    plt.xlim([2*10**1, 2*10**5])
+    # plt.ylim(bottom=2*10**-7)
+    # plt.xlim(left=2*10**1)
+    plt.ylim([2*10**-10, 2*10**-3]) # setting y-axis range
+    plt.legend(fontsize=20)
+    plt.grid(True)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.show()
+    # Plotting the Power Spectral Density
+    plt.figure(figsize=(fig_xsize, 6))
+    plt.loglog(frequencies/1000, psd_valuesRho,"black",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2Rho,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.title('Density PSD', fontsize=22)
+    plt.xlabel('Frequency [kHz]', fontsize=18)
+    plt.ylabel('PSD [rho**2/Hz]', fontsize=18)
+    plt.xlim([2*10**1, 2*10**5])
+    # plt.ylim(bottom=2*10**-8)
+    # plt.xlim(left=2*10**1)
+    plt.ylim([10**-10, 5*10**-2]) # setting y-axis range
+    plt.legend(fontsize=20)
+    plt.grid(True)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.show()
 # plotPSD(df)
 plotPSD2(df,df2, point)
 # plotPSD2_100(df,df2, point)
 # plotPSD2_kucuk(df,df2, point)
+# plotPSD2_jetcomp(df,df2, point)
