@@ -58,9 +58,7 @@ with open(file_path_main, 'r') as mainFile, open(file_path_ref, 'r') as refFile,
             # Split the line into individual values
             mainValues = stripped_lineMain.split()
             refValues = stripped_lineRef.split()
-            # ratio_pressure_percent = abs((float(mainValues[press_column_index]) - float(refValues[press_column_index])) / ((float(refValues[press_column_index]) + float(mainValues[press_column_index]) +1/100000000000)/2)*100)
-            ratio_pressure_percent = (float(mainValues[press_column_index]) - float(refValues[press_column_index]))
-            # ratio_pressure_percent = ((float(mainValues[press_column_index]) - float(refValues[press_column_index])) / ((float(refValues[press_column_index]) + float(mainValues[press_column_index]) +1/100000000000)/2)*100)
+            pressureDIF = (float(mainValues[press_column_index]) - float(refValues[press_column_index]))
             ratio_Rho_percent = ((float(mainValues[Rho_column_index]) - float(refValues[Rho_column_index])) / ((float(refValues[Rho_column_index]) + float(mainValues[Rho_column_index]) +1/100000000000)/2)*100)
             ratio_Ma_percent = abs((float(mainValues[MA_column_index]) - float(refValues[MA_column_index])))
             ratio_T_percent = ((float(mainValues[T_column_index]) - float(refValues[T_column_index])) / ((float(refValues[T_column_index]) + float(mainValues[T_column_index]) +1/100000000000)/2)*100)
@@ -78,7 +76,7 @@ with open(file_path_main, 'r') as mainFile, open(file_path_ref, 'r') as refFile,
 
             rho_dif = 1
             ma_dif = 2
-            modified_line = '\t'.join(mainValues + ["{:.6E}".format(ratio_Rho_percent)] + ["{:.6E}".format(ratio_Ma_percent)] + ["{:.6E}".format(ratio_pressure_percent)] + ["{:.6E}".format(ratio_T_percent)] + ["{:.6E}".format(V_ref)] + ["{:.6E}".format(rho_ref)] + ["{:.6E}".format(P_ref)] + ["{:.6E}".format(wavespeed)]) + '\n'
+            modified_line = '\t'.join(mainValues + ["{:.6E}".format(ratio_Rho_percent)] + ["{:.6E}".format(ratio_Ma_percent)] + ["{:.6E}".format(pressureDIF)] + ["{:.6E}".format(ratio_T_percent)] + ["{:.6E}".format(V_ref)] + ["{:.6E}".format(rho_ref)] + ["{:.6E}".format(P_ref)] + ["{:.6E}".format(wavespeed)]) + '\n'
             modified.write(modified_line)
 
 new_file_path
