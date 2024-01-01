@@ -30,24 +30,8 @@ def plotPSD(data):
     actual_data = data_of_interest[cutoff:]
     cutoff_timesteps = time_step[cutoff:]
 
-    # # Plot the data
-    # plt.figure(figsize=(12, 6))
-    # plt.plot(cutoff_timesteps, actual_data, marker='o', linestyle='-')
-    # plt.xlabel('Time (s))')
-    # plt.ylabel('Pressure (Pa)')
-    # plt.title('Pressure vs Time')
-    # # plt.grid(True)
-    # plt.show()
-
     # # # Detrend the data to make it stationary
     detrended_data = signal.detrend(actual_data)
-    # plt.figure(figsize=(12, 6))
-    # plt.plot(cutoff_timesteps, detrended_data, marker='o', linestyle='-')
-    # plt.xlabel('Time (s))')
-    # plt.ylabel('Pressure Perturbation (Pa)')
-    # plt.title('Unsteady Pressure')
-    # # plt.grid(True)
-    # plt.show()
     detrended_data_array = np.array(detrended_data)
     # Calculate the Power Spectral Density using Fast Fourier Transform
     samplingFreq = 1/tau
