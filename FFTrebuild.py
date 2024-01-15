@@ -62,7 +62,7 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "100at5"
+caseName = "ref_control"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -80,12 +80,13 @@ stdDevList_t= []
 strlist_r = []
 phaselist_r = []
 stdDevList_r= []
+Targetfreq=100e3
 for point in range(1, 11):
-    file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
+    file_path = f"./PM_BC_jan/{caseName}/Point{str(point)}.dat"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)
-    amplitude_r, phase_r, stdDev_r = rebuild_signal(data.iloc[:, 9], 100e3, 5e-9, plot=False)
-    amplitude_t, phase_t, stdDev_t = rebuild_signal(data.iloc[:, 13], 100e3, 5e-9, plot=True)
-    amplitude_p, phase_p, stdDev_p = rebuild_signal(data.iloc[:, 16], 100e3, 5e-9, plot=False)
+    amplitude_r, phase_r, stdDev_r = rebuild_signal(data.iloc[:, 9], Targetfreq, 5e-9, plot=False)
+    amplitude_t, phase_t, stdDev_t = rebuild_signal(data.iloc[:, 13], Targetfreq, 5e-9, plot=True)
+    amplitude_p, phase_p, stdDev_p = rebuild_signal(data.iloc[:, 16], Targetfreq, 5e-9, plot=False)
     strlist_r.append(amplitude_r)
     phaselist_r.append(180 - phase_r*180/3.14)
     stdDevList_r.append(stdDev_r)
@@ -137,6 +138,6 @@ ax3.set_xticks([i+1 for i in range(len(stdDevList_r))])
 
 plt.tight_layout()
 
-file_pathplot = f"./PM_BC_december/{caseName}/plot.png"
+file_pathplot = f"./PM_BC_jan/{caseName}/plot.png"
 plt.savefig(file_pathplot)
 plt.show()
