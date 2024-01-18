@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-casename = "5mm"
+casename = "5mm500khz"
 file_path_main = f'./PM_BC_jan/{casename}.tec'
 # file_path_ref = './PM_BC_december/ref_case3_0_1.tec'
 file_path_ref = './PM_BC_jan/ref.tec'

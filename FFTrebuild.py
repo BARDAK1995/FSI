@@ -4,7 +4,7 @@ from scipy.fft import fft, ifft
 import matplotlib.pyplot as plt
 
 
-def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_start=10000, truncate_end=30000, plot=False):
+def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_start=5000, truncate_end=20000, plot=False):
     """
     Rebuilds a signal from a pandas series using a target frequency.
     
@@ -62,7 +62,7 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "ref_control"
+caseName = "5mm500khz"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -80,7 +80,7 @@ stdDevList_t= []
 strlist_r = []
 phaselist_r = []
 stdDevList_r= []
-Targetfreq=100e3
+Targetfreq=500e3
 for point in range(1, 11):
     file_path = f"./PM_BC_jan/{caseName}/Point{str(point)}.dat"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)

@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
 # Read the file into a DataFrame, assuming space-separated values and no header
-caseName = "case2_1mm"
+caseName = "5mm200khz"
 # caseName = "CASE2"
-point = 6
+point = 2
 # caseName = "case1_2mm"
 # caseName = "oscilatingPM50"
 
-file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
-file_path2 = f"./PM_BC_december/ref/Point{str(point)}.dat"
+file_path = f"./PM_BC_jan/{caseName}/Point{str(point)}.dat"
+file_path2 = f"./PM_BC_jan/ref/Point{str(point)}.dat"
 # file_path2 = f"./PM_BC_december/case1_2mm/Point{str(point)}.dat"
 
 # file_path2 = f"./PM_BC_1/{caseName}/Point{str(point+5)}.dat"
