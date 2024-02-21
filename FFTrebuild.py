@@ -4,49 +4,26 @@ from scipy.fft import fft, ifft
 import matplotlib.pyplot as plt
 
 
-def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_start=5000, truncate_end=20000, plot=False):
-    """
-    Rebuilds a signal from a pandas series using a target frequency.
-    
-    Parameters:
-    - data_series: Pandas series containing the original data.
-    - target_freq_hz: The frequency in Hz to use for rebuilding the signal.
-    - timestep_duration: The duration of each timestep in seconds.
-    - truncate_start: The starting index for truncating the data.
-    - truncate_end: The ending index for truncating the data.
-    - plot: Boolean flag to enable or disable plotting functionality.
-    
-    Returns:
-    - amplitude: The amplitude of the rebuilt signal.
-    - phase: The phase of the rebuilt signal in radians.
-    """
+def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_start=10000, truncate_end=20000, plot=False):
     # Truncate the data
     truncated_data = data_series[truncate_start:truncate_end].reset_index(drop=True)
-    
     # Convert truncated data to numpy array for FFT analysis
     truncated_data_array = truncated_data.to_numpy()
-    
     # Perform FFT on the truncated data to obtain the frequency spectrum
     fft_result = fft(truncated_data_array)
     fft_frequencies = np.fft.fftfreq(len(truncated_data_array), d=timestep_duration)
-    
     # Locate the index of the target frequency in the FFT result
     index_target = np.argmin(np.abs(fft_frequencies - target_freq_hz))
-    
     # Extract the complex amplitude of the target frequency
     complex_amplitude = fft_result[index_target]
-    
     # Calculate the peak amplitude and phase of the sine wave at the target frequency
     amplitude = np.abs(complex_amplitude) * 2 / len(truncated_data_array)
     phase = np.angle(complex_amplitude)
-    
     # Time vector for the truncated data
     time_vector = np.arange(truncate_start, truncate_end) * timestep_duration
-    
     # Rebuild the signal with the target frequency component including the phase
     rebuilt_signal_with_phase = amplitude * np.cos(2 * np.pi * target_freq_hz * time_vector + phase)
     std_dev = np.std(truncated_data_array)  # Calculate the standard deviation
-
     if plot:
         # Plot the original data and the rebuilt signal with phase correction for comparison
         plt.figure(figsize=(12, 6))
@@ -62,7 +39,7 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "5mm500khz"
+caseName = "5mm"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -80,7 +57,8 @@ stdDevList_t= []
 strlist_r = []
 phaselist_r = []
 stdDevList_r= []
-Targetfreq=500e3
+Targetfreq=100e3
+
 for point in range(1, 11):
     file_path = f"./PM_BC_jan/{caseName}/Point{str(point)}.dat"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)
