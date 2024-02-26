@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
 
-casename = "5mm500khz"
-file_path_main = f'./PM_BC_jan/{casename}.tec'
+casename = "500hz_at5"
+file_path_main = f'./PM_feb/{casename}.tec'
 # file_path_ref = './PM_BC_december/ref_case3_0_1.tec'
-file_path_ref = './PM_BC_jan/ref.tec'
+file_path_ref = './PM_feb/ref.tec'
 
-new_file_path = f'./PM_BC_jan/m_{casename}.tec'
+new_file_path = f'./PM_feb/m_{casename}.tec'
 
 with open(file_path_main, 'r') as mainFile, open(file_path_ref, 'r') as refFile, open(new_file_path, 'w') as modified:
     # Writing the first and modified second lines to the new file
