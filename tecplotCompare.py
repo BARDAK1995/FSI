@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 
-casename = "500hz_at5"
+casename = "100hz_at5Edge"
 file_path_main = f'./PM_feb/{casename}.tec'
 # file_path_ref = './PM_BC_december/ref_case3_0_1.tec'
-file_path_ref = './PM_feb/ref.tec'
+file_path_ref = './PM_feb/ref_edge.tec'
 
 new_file_path = f'./PM_feb/m_{casename}.tec'
 

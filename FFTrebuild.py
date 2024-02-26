@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from scipy.fft import fft, ifft
 import matplotlib.pyplot as plt
+from scipy.ndimage import gaussian_filter1d
 
 
 def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_start=10000, truncate_end=30000, plot=False):
@@ -54,7 +55,10 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "500hzat5"
+caseName = "100hz_at5_edge"
+# caseName = "ref_edge"
+
+caseNameREF = "ref_edge"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -69,16 +73,30 @@ strlist_t = []
 phaselist_t = []
 stdDevList_t= []
 
+phaselist_tRef = []
+strlist_tRef = []
+
 strlist_r = []
 phaselist_r = []
 stdDevList_r= []
-Targetfreq=500e3
+Targetfreq=100e3
+
 for point in range(1, 90):
     file_path = f"./PM_feb/{caseName}/PROBE_{str(point)}"
+    file_path_ref = f"./PM_feb/{caseNameREF}/PROBE_{str(point)}"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)
+    dataref = pd.read_csv(file_path_ref, delim_whitespace=True, header=None)
+    if(point==40):
+        plotflag=True
+    else:
+        plotflag=False
     amplitude_r, phase_r, stdDev_r = rebuild_signal(data.iloc[:, 9], Targetfreq, 5e-9, plot=False)
-    amplitude_t, phase_t, stdDev_t = rebuild_signal(data.iloc[:, 13], Targetfreq, 5e-9, plot=False)
+    amplitude_t, phase_t, stdDev_t = rebuild_signal(data.iloc[:, 13], Targetfreq, 5e-9, plot=plotflag)
     amplitude_p, phase_p, stdDev_p = rebuild_signal(data.iloc[:, 16], Targetfreq, 5e-9, plot=False)
+    
+    amplitude_tRef, phase_tRef, stdDev_tRef = rebuild_signal(dataref.iloc[:, 13], Targetfreq, 5e-9, plot=False)
+
+    
     strlist_r.append(amplitude_r)
     phaselist_r.append(180 - phase_r*180/3.14)
     stdDevList_r.append(stdDev_r)
@@ -91,19 +109,39 @@ for point in range(1, 90):
     phaselist_t.append(180 - phase_t*180/3.14)
     stdDevList_t.append(stdDev_t)
 
+    strlist_tRef.append(amplitude_tRef)
+    phaselist_tRef.append(180 - phase_tRef*180/3.14)
 
 # fig, ax1 = plt.subplots(1, 1, figsize=(10, 3), sharex=True)
 # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+# window_size = 3  # You can adjust this value as needed
+# kernel = np.ones(window_size) / window_size
+# strlist_r = np.convolve(strlist_r, kernel, mode='valid')
+
+sigma = 1  # Adjust this value to control the amount of smoothing
+# Apply a Gaussian filter for a non-uniform weighted moving average
+strlist_r = gaussian_filter1d(strlist_r, sigma=sigma)
+strlist_t = gaussian_filter1d(strlist_t, sigma=sigma)
+strlist_p = gaussian_filter1d(strlist_p, sigma=sigma)
+strlist_tRef = gaussian_filter1d(strlist_tRef, sigma=sigma)
+
+stdDevList_r = gaussian_filter1d(stdDevList_r, sigma=sigma*2)
+stdDevList_t = gaussian_filter1d(stdDevList_t, sigma=sigma*2)
+stdDevList_p = gaussian_filter1d(stdDevList_p, sigma=sigma*2)
 
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 6), sharex=True)
 
 # Plot strlist in the top subplot
 ax1_r = ax1.twinx()
-ax1_r.plot([(-1.5 + i*1.5) for i in range(len(strlist_r))], strlist_r, '-', color='gray', linewidth=1, label='Density')
-ax1.plot([(-1.5 + i*1.5)  for i in range(len(strlist_t))], strlist_t, '-', color='red', linewidth=1, label='Temperature')
-ax1.plot([(-1.5 + i*1.5) for i in range(len(strlist_p))], strlist_p, '-', color='blue', linewidth=1, label='Pressure')
+ax1_r.plot([(-0.0 + i*15/90) for i in range(len(strlist_r))], strlist_r, '-', color='black', linewidth=1, label='Density')
+ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_t))], strlist_t, '-', color='red', linewidth=1, label='Temperature')
+ax1.plot([(-0.0 + i*15/90) for i in range(len(strlist_p))], strlist_p, '-', color='blue', linewidth=1, label='Pressure')
+ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_tRef))], strlist_tRef, '--', color='purple', linewidth=0.5, label='TemperatureREF')
+
+
 ax1.set_ylabel('Perturb AMPLITUDE')
-ax1.set_xlabel('Location (mm)')
+# ax1.set_xlabel('Location (mm)')
 
 ax1_r.set_ylabel('Density', color='gray')
 ax1.legend(loc='upper left')
@@ -111,19 +149,22 @@ ax1_r.legend(loc='upper right')
 ax1.grid(axis='x')
 
 # Plot phaselist in the middle subplot
-ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_r))], phaselist_r, '-', color='gray', linewidth=1, label='Density')
-ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_t))], phaselist_t, '-', color='red', linewidth=1, label='Temperature')
-ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_p))], phaselist_p, '-', color='blue', linewidth=1, label='Pressure')
+# ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_r))], phaselist_r, '-', color='gray', linewidth=1, label='Density')
+ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_t))], phaselist_t, '-', color='red', linewidth=1, label='Temperature')
+# ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_p))], phaselist_p, '-', color='blue', linewidth=1, label='Pressure')
+ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_tRef))], phaselist_tRef, '--', color='black', linewidth=1, label='Temperature_REF')
+
+
 ax2.set_ylabel('Phase (degrees)')
 ax2.legend(loc='upper left')
 ax2.grid(axis='x')
 
 # Plot stdDevList in the bottom subplot
 ax3_r = ax3.twinx()
-ax3_r.plot([(-1.5 + i*1.5)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
-ax3.plot([(-1.5 + i*1.5)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
-ax3.plot([(-1.5 + i*1.5) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
-ax3.set_xlabel('Probe Index')
+ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+ax3.set_xlabel('Probe Location(mm)')
 ax3.set_ylabel('STD dev')
 ax3_r.set_ylabel('Density', color='gray')
 ax3.legend(loc='upper left')
@@ -131,11 +172,12 @@ ax3_r.legend(loc='upper right')
 ax3.grid(axis='x')
 
 # Set xticks
-# ax3.set_xticks([i+1 for i in range(len(stdDevList_r))])
+# ax3.set_xticks([(-0.0 + i*15/90) for i in range(len(stdDevList_r))])
+ax3.set_xticks(np.linspace(0, 14, 15))
 # ax1.set_xticks([(-1.5 + i*1.5) for i in range(len(stdDevList_r))])
 
 plt.tight_layout()
 
-file_pathplot = f"./PM_feb/{caseName}/plot.png"
+file_pathplot = f"./PM_feb/{caseName}/plot_{Targetfreq}.png"
 plt.savefig(file_pathplot)
 plt.show()

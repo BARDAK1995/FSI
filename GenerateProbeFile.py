@@ -33,8 +33,8 @@ def write_points_to_file(filename, points):
 
 # Parameters
 n_points = 90
-start = (-3/1000, 0.2/1000)
-end = (15/1000, 0.2/1000)
+start = (-0.003, 0.002)
+end = (0.015, 0.002)
 # Generate the points
 points = generate_points(start, end, n_points)
 
