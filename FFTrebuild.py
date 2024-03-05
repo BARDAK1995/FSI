@@ -55,7 +55,7 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "100hz_at5_edge"
+caseName = "35_4mm"
 # caseName = "ref_edge"
 
 caseNameREF = "ref_edge"
@@ -82,30 +82,33 @@ stdDevList_r= []
 Targetfreq=100e3
 
 for point in range(1, 90):
-    file_path = f"./PM_feb/{caseName}/PROBE_{str(point)}"
-    file_path_ref = f"./PM_feb/{caseNameREF}/PROBE_{str(point)}"
+    file_path = f"./PM_march/{caseName}/PROBE_{str(point)}"
+    file_path_ref = f"./PM_march/{caseNameREF}/PROBE_{str(point)}"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)
     dataref = pd.read_csv(file_path_ref, delim_whitespace=True, header=None)
     if(point==40):
         plotflag=True
     else:
         plotflag=False
-    amplitude_r, phase_r, stdDev_r = rebuild_signal(data.iloc[:, 9], Targetfreq, 5e-9, plot=False)
-    amplitude_t, phase_t, stdDev_t = rebuild_signal(data.iloc[:, 13], Targetfreq, 5e-9, plot=plotflag)
-    amplitude_p, phase_p, stdDev_p = rebuild_signal(data.iloc[:, 16], Targetfreq, 5e-9, plot=False)
+    densityDATA= data.iloc[:, 9]
+    temperatureDATA= data.iloc[:, 13]
+    pressureDATA= data.iloc[:, 16]
+    amplitude_r, phase_r, stdDev_r = rebuild_signal(densityDATA, Targetfreq, 5e-9, plot=plotflag)
+    amplitude_t, phase_t, stdDev_t = rebuild_signal(temperatureDATA, Targetfreq, 5e-9, plot=plotflag)
+    amplitude_p, phase_p, stdDev_p = rebuild_signal(pressureDATA, Targetfreq, 5e-9, plot=plotflag)
     
-    amplitude_tRef, phase_tRef, stdDev_tRef = rebuild_signal(dataref.iloc[:, 13], Targetfreq, 5e-9, plot=False)
+    amplitude_tRef, phase_tRef, stdDev_tRef = rebuild_signal(dataref.iloc[:, 13], Targetfreq, 5e-9, plot=False)/np.mean(dataref.iloc[:, 13])*100
 
     
-    strlist_r.append(amplitude_r)
+    strlist_r.append(amplitude_r/np.mean(densityDATA)*100)
     phaselist_r.append(180 - phase_r*180/3.14)
     stdDevList_r.append(stdDev_r)
 
-    strlist_p.append(amplitude_p)
+    strlist_p.append(amplitude_p/np.mean(pressureDATA)*100)
     phaselist_p.append(180 - phase_p*180/3.14)
     stdDevList_p.append(stdDev_p)
 
-    strlist_t.append(amplitude_t)
+    strlist_t.append(amplitude_t/np.mean(temperatureDATA)*100)
     phaselist_t.append(180 - phase_t*180/3.14)
     stdDevList_t.append(stdDev_t)
 
@@ -137,6 +140,7 @@ ax1_r = ax1.twinx()
 ax1_r.plot([(-0.0 + i*15/90) for i in range(len(strlist_r))], strlist_r, '-', color='black', linewidth=1, label='Density')
 ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_t))], strlist_t, '-', color='red', linewidth=1, label='Temperature')
 ax1.plot([(-0.0 + i*15/90) for i in range(len(strlist_p))], strlist_p, '-', color='blue', linewidth=1, label='Pressure')
+
 ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_tRef))], strlist_tRef, '--', color='purple', linewidth=0.5, label='TemperatureREF')
 
 
@@ -149,9 +153,9 @@ ax1_r.legend(loc='upper right')
 ax1.grid(axis='x')
 
 # Plot phaselist in the middle subplot
-# ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_r))], phaselist_r, '-', color='gray', linewidth=1, label='Density')
+ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_r))], phaselist_r, '-', color='gray', linewidth=1, label='Density')
 ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_t))], phaselist_t, '-', color='red', linewidth=1, label='Temperature')
-# ax2.plot([(-1.5 + i*1.5)  for i in range(len(phaselist_p))], phaselist_p, '-', color='blue', linewidth=1, label='Pressure')
+# ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_p))], phaselist_p, '-', color='blue', linewidth=1, label='Pressure')
 ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_tRef))], phaselist_tRef, '--', color='black', linewidth=1, label='Temperature_REF')
 
 
@@ -178,6 +182,6 @@ ax3.set_xticks(np.linspace(0, 14, 15))
 
 plt.tight_layout()
 
-file_pathplot = f"./PM_feb/{caseName}/plot_{Targetfreq}.png"
+file_pathplot = f"./PM_march/{caseName}/plot_{Targetfreq}.png"
 plt.savefig(file_pathplot)
 plt.show()
