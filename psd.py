@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
 # Read the file into a DataFrame, assuming space-separated values and no header
-caseName = "100hz_at5_edge"
+caseName = "35_4mm"
 # caseName = "CASE2"
-point = 10
+point = 33
 # caseName = "case1_2mm"
 # caseName = "oscilatingPM50"
 
-file_path = f"./PM_feb/{caseName}/PROBE_{str(point)}"
-file_path2 = f"./PM_feb/ref_edge/PROBE_{str(point)}"
+file_path = f"./PM_march/{caseName}/PROBE_{str(point)}"
+file_path2 = f"./PM_march/ref_edge/PROBE_{str(point)}"
 # file_path2 = f"./PM_BC_december/case1_2mm/Point{str(point)}.dat"
 
 # file_path2 = f"./PM_BC_1/{caseName}/Point{str(point+5)}.dat"
@@ -162,8 +162,8 @@ def plotPSD22(data, data2):
     data_of_interest = np.array(data[16])
     data_of_interest2 = np.array(data2[16])
 
-    cutoff = len(data_of_interest)//4
-    cutoff2 = len(data_of_interest2)//4
+    cutoff = len(data_of_interest)//4*0
+    cutoff2 = len(data_of_interest2)//4*0
 
     cutoffTime = cutoff * tau
     cutoffTime2 = cutoff2 * tau
@@ -228,15 +228,14 @@ def plotPSD2_kucuk(data, data2, probe):
     # 10vx 11vy 13t 14trot 15tvib 16p
     data_of_interest = np.array(data[[indexp,indext,indexrho]])
     data_of_interest2 = np.array(data2[[indexp,indext,indexrho]])
-    cutoff = len(data_of_interest[:,0])//5
-    cutoff2 = len(data_of_interest2[:,0])//5
+    cutoff = len(data_of_interest[:,0])//5*0
+    cutoff2 = len(data_of_interest2[:,0])//5*0
     # cutoffTime = cutoff * tau
     # cutoffTime2 = cutoff2 * tau
     actual_data = data_of_interest[cutoff:]
     actual_data2 = data_of_interest2[cutoff2:]
     cutoff_timesteps = time_step[cutoff:]
     # cutoff_timesteps2 = time_step2[cutoff2:]
-    asd=9*(10**8)*2*(10**12)
     # Plot the data
     plt.figure(figsize=(12, 6))
     plt.plot(cutoff_timesteps, actual_data[:,0],"blue",linewidth=0.3, linestyle='-')
@@ -275,14 +274,16 @@ def plotPSD2_kucuk(data, data2, probe):
     frequencies2, psd_values2Rho = signal.welch(detrended_data2_rho, fs=samplingFreq, nperseg=100000)
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=3, label='With PM') #label='Perturbed Flow via Pulsed Jet'
     plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label='reference') #label='No Jet(Reference State)'
-    plt.title('Pressure PSD', fontsize=22)
+    plt.axvline(x=100, color='k', linestyle='--', linewidth=1.4)  # x is in kHz, so divide by 1000
+
+    # plt.title('Pressure PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [P**2/Hz]', fontsize=18)
     plt.xlim([xxmin, xxmax])
     # plt.xlim(left=2*10**1)
-    plt.ylim([2*10**-10, 2*10**-5]) # setting y-axis range
+    plt.ylim([2*10**-10, 2*10**-4]) # setting y-axis range
     # plt.ylim(bottom=2*10**-8)
     plt.legend(fontsize=20)
     plt.grid(True)
@@ -291,9 +292,11 @@ def plotPSD2_kucuk(data, data2, probe):
     plt.show()
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=3, label='With PM') #label='Perturbed Flow via Pulsed Jet'
     plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label='reference') #label='No Jet(Reference State)'
-    plt.title('Translational Temperature PSD', fontsize=22)
+    # plt.title('Translational Temperature PSD', fontsize=22)
+    plt.axvline(x=100, color='k', linestyle='--', linewidth=1.4)  # x is in kHz, so divide by 1000
+
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [T**2/Hz]', fontsize=18)
     plt.xlim([xxmin, xxmax])
@@ -307,15 +310,17 @@ def plotPSD2_kucuk(data, data2, probe):
     plt.show()
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesRho,"black",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies/1000, psd_valuesRho,"black",linewidth=3, label='With PM') #label='Perturbed Flow via Pulsed Jet'
     plt.loglog(frequencies2/1000, psd_values2Rho,linewidth=1, label='reference') #label='No Jet(Reference State)'
-    plt.title('Density PSD', fontsize=22)
+    # plt.title('Density PSD', fontsize=22)
+    plt.axvline(x=100, color='k', linestyle='--', linewidth=1.4)  # x is in kHz, so divide by 1000
+
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [rho**2/Hz]', fontsize=18)
     plt.xlim([xxmin, xxmax])
     # plt.ylim(bottom=2*10**-8)
     # plt.xlim(left=2*10**1)
-    plt.ylim([10**-10, 5*10**-3]) # setting y-axis range
+    plt.ylim([10**-9, 2*10**-2]) # setting y-axis range
     plt.legend(fontsize=20)
     plt.grid(True)
     plt.xticks(fontsize=20)
@@ -537,7 +542,7 @@ def plotPSD2_jetcomp(data, data2, probe):
     plt.yticks(fontsize=20)
     plt.show()
 # plotPSD(df)
-plotPSD2(df,df2, point)
+# plotPSD2(df,df2, point)
 # plotPSD2_100(df,df2, point)
-# plotPSD2_kucuk(df,df2, point)
+plotPSD2_kucuk(df,df2, point)
 # plotPSD2_jetcomp(df,df2, point)

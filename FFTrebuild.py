@@ -55,10 +55,10 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "500hzat5"
+caseName = "100hz_at5_edge"
 # caseName = "ref_edge"
 
-caseNameREF = "ref"
+caseNameREF = "ref_edge"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -75,8 +75,12 @@ stdDevList_t= []
 
 phaselist_pRef = []
 phaselist_tRef = []
+phaselist_rRef = []
+
 strlist_pRef = []
 strlist_tRef = []
+strlist_rRef = []
+
 
 strlist_r = []
 phaselist_r = []
@@ -100,7 +104,8 @@ for point in range(1, 90):
     amplitude_p, phase_p, stdDev_p = rebuild_signal(pressureDATA, Targetfreq, 5e-9, plot=plotflag)
     
     amplitude_tRef, phase_tRef, stdDev_tRef = rebuild_signal(dataref.iloc[:, 13], Targetfreq, 5e-9, plot=False)
-    amplitude_pRef, phase_pRef, stdDev_pRef = rebuild_signal(dataref.iloc[:, 16], Targetfreq, 5e-9, plot=False)/np.mean(dataref.iloc[:, 16])*100
+    amplitude_pRef, phase_pRef, stdDev_pRef = rebuild_signal(dataref.iloc[:, 16], Targetfreq, 5e-9, plot=False)
+    amplitude_rRef, phase_rRef, stdDev_rRef = rebuild_signal(dataref.iloc[:, 9], Targetfreq, 5e-9, plot=False)
 
     
     strlist_r.append(amplitude_r/np.mean(densityDATA)*100)
@@ -121,6 +126,9 @@ for point in range(1, 90):
     strlist_pRef.append(amplitude_pRef/np.mean(dataref.iloc[:, 16])*100)
     phaselist_pRef.append(180 - phase_pRef*180/3.14)
 
+    strlist_rRef.append(amplitude_rRef/np.mean(dataref.iloc[:, 9])*100)
+    phaselist_rRef.append(180 - phase_rRef*180/3.14)
+
 # fig, ax1 = plt.subplots(1, 1, figsize=(10, 3), sharex=True)
 # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
 
@@ -128,67 +136,240 @@ for point in range(1, 90):
 # kernel = np.ones(window_size) / window_size
 # strlist_r = np.convolve(strlist_r, kernel, mode='valid')
 
-sigma = 1  # Adjust this value to control the amount of smoothing
+sigma = 0.8  # Adjust this value to control the amount of smoothing
 # Apply a Gaussian filter for a non-uniform weighted moving average
 strlist_r = gaussian_filter1d(strlist_r, sigma=sigma)
 strlist_t = gaussian_filter1d(strlist_t, sigma=sigma)
 strlist_p = gaussian_filter1d(strlist_p, sigma=sigma)
 strlist_tRef = gaussian_filter1d(strlist_tRef, sigma=sigma)
+strlist_pRef = gaussian_filter1d(strlist_pRef, sigma=sigma)
+strlist_rRef = gaussian_filter1d(strlist_tRef, sigma=sigma)
+
 
 stdDevList_r = gaussian_filter1d(stdDevList_r, sigma=sigma*2)
 stdDevList_t = gaussian_filter1d(stdDevList_t, sigma=sigma*2)
 stdDevList_p = gaussian_filter1d(stdDevList_p, sigma=sigma*2)
 
-fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(10, 6), sharex=True)
+phaselist_r = np.array(phaselist_r)
+phaselist_rRef = np.array(phaselist_rRef)
+phaselist_t = np.array(phaselist_t)
+phaselist_tRef = np.array(phaselist_tRef)
 
-# Plot strlist in the top subplot
-ax1_r = ax1.twinx()
-ax1_r.plot([(-0.0 + i*15/90) for i in range(len(strlist_r))], strlist_r, '-', color='black', linewidth=1, label='Density')
-ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_t))], strlist_t, '-', color='red', linewidth=1, label='Temperature')
-ax1.plot([(-0.0 + i*15/90) for i in range(len(strlist_p))], strlist_p, '-', color='blue', linewidth=1, label='Pressure')
+phaselist_p = np.array(phaselist_p)
+phaselist_pRef = np.array(phaselist_pRef)
 
-ax1.plot([(-0.0 + i*15/90)  for i in range(len(strlist_tRef))], strlist_tRef, '--', color='purple', linewidth=0.5, label='TemperatureREF')
+# phaselist_r[phaselist_r > 350] = 0
+# Define the thresholds
+high_threshold = 320
+neighbor_threshold = 50
+
+# Iterate through the array
+def tresholder(phaselist,high_threshold,neighbor_threshold):
+    for i in range(1, len(phaselist) - 1):  # Exclude the first and last element
+        # If the current value is greater than high_threshold
+        # and both neighbors are less than neighbor_threshold
+        if (phaselist[i] > high_threshold and
+            phaselist[i-1] < neighbor_threshold and
+            phaselist[i+1] < neighbor_threshold):
+            phaselist[i] = 0  # Set the current value to 0
+    return phaselist
+
+phaselist_r = tresholder(phaselist_r,high_threshold,neighbor_threshold)
+phaselist_rRef = tresholder(phaselist_rRef,high_threshold,neighbor_threshold)
+phaselist_t = tresholder(phaselist_t,high_threshold,neighbor_threshold)
+phaselist_tRef = tresholder(phaselist_tRef,high_threshold,neighbor_threshold)
+
+phaselist_r2 = phaselist_r / 180 * np.pi
+phaselist_rRef2 = phaselist_rRef / 180 * np.pi
+phaselist_t2 = phaselist_t / 180 * np.pi
+phaselist_tRef2 = phaselist_tRef / 180 * np.pi
+
+phaselist_p2 = phaselist_p / 180 * np.pi
+phaselist_pRef2 = phaselist_pRef / 180 * np.pi
 
 
-ax1.set_ylabel('Perturb AMPLITUDE')
-# ax1.set_xlabel('Location (mm)')
+plt.figure(figsize=(12, 4))
+plt.plot([(-0.0 + i*15/90) for i in range(len(strlist_r))], strlist_r, '-', color='black', linewidth=1, label='Density Perturbations (PM)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(strlist_t))], strlist_t, '-', color='red', linewidth=1, label='Temperature Perturbations (PM)')
+plt.plot([(-0.0 + i*15/90) for i in range(len(strlist_p))], strlist_p, '-', color='blue', linewidth=1, label='Pressure Perturbations (PM)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(strlist_rRef))], strlist_rRef, '--', color='black', linewidth=0.5, label='Density Perturbations (Reference)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(strlist_tRef))], strlist_tRef, '--', color='red', linewidth=0.5, label='Temperature Perturbations (Reference)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(strlist_pRef))], strlist_pRef, '--', color='blue', linewidth=0.5, label='Pressure Perturbations (Reference)')
+plt.xlabel('Probe Location (mm)',fontsize=14)
+plt.ylabel(r'Perturbation Amplitude (\%)', fontsize=14)
 
-ax1_r.set_ylabel('Density', color='gray')
-ax1.legend(loc='upper left')
-ax1_r.legend(loc='upper right')
-ax1.grid(axis='x')
+# Add a note in the lower left
+plt.annotate('w = 500kHz', xy=(0.043, 0.9), xycoords='axes fraction', fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=12)
+# Since you called plt.legend() twice, only the second one will take effect. If you want both positions, you need two legend handles
+handles, labels = plt.gca().get_legend_handles_labels()
+by_label = dict(zip(labels, handles))
+plt.legend(by_label.values(), by_label.keys(), loc='upper left')
+plt.legend(by_label.values(), by_label.keys(), loc='upper right')
+plt.ylim(0, 5)
 
-# Plot phaselist in the middle subplot
-# ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_r))], phaselist_r, '-', color='gray', linewidth=1, label='Density')
-# ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_t))], phaselist_t, '-', color='red', linewidth=1, label='Temperature')
-ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_p))], phaselist_p, '-', color='blue', linewidth=1, label='Pressure')
-# ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_tRef))], phaselist_tRef, '--', color='black', linewidth=1, label='Temperature_REF')
-# ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_pRef))], phaselist_pRef, '--', color='blue', linewidth=1, label='Temperature_REF')
+plt.xticks(np.linspace(0, 14, 15))
+plt.grid(axis='x')
+
+plt.show()
 
 
+
+
+
+
+fig, (ax2, ax3,ax4) = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+
+ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_p2))], phaselist_p2, '-', color='blue', linewidth=1, label='Pressure')
+ax2.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_pRef2))], phaselist_pRef2, '--', color='blue', linewidth=1, label='Temperature_REF')
 ax2.set_ylabel('Phase (degrees)')
 ax2.legend(loc='upper left')
 ax2.grid(axis='x')
+ax2.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
+# Plot phaselist in the middle subplot
+ax3.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_t2))], phaselist_t2, '-', color='red', linewidth=1, label='Temperature')
+ax3.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_tRef2))], phaselist_tRef2, '--', color='red', linewidth=1, label='Density_REF')
 
-# Plot stdDevList in the bottom subplot
-ax3_r = ax3.twinx()
-ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
-ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
-ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
-ax3.set_xlabel('Probe Location(mm)')
-ax3.set_ylabel('STD dev')
-ax3_r.set_ylabel('Density', color='gray')
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+# ax3.set_xlabel('Probe Location(mm)')
+# ax3.set_ylabel('STD dev')
+ax3.set_ylabel('Density', color='gray')
 ax3.legend(loc='upper left')
-ax3_r.legend(loc='upper right')
+ax3.legend(loc='upper right')
 ax3.grid(axis='x')
+ax3.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
 
 # Set xticks
 # ax3.set_xticks([(-0.0 + i*15/90) for i in range(len(stdDevList_r))])
 ax3.set_xticks(np.linspace(0, 14, 15))
 # ax1.set_xticks([(-1.5 + i*1.5) for i in range(len(stdDevList_r))])
 
+ax4.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_r2))], phaselist_r2, '-', color='black', linewidth=1, label='Density')
+ax4.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_rRef2))], phaselist_rRef2, '--', color='black', linewidth=1, label='Temperature_REF')
+
+
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+ax4.set_xlabel('Probe Location(mm)')
+ax4.set_ylabel('STD dev')
+ax4.set_ylabel('Density', color='gray')
+ax4.legend(loc='upper left')
+ax4.legend(loc='upper right')
+ax4.grid(axis='x')
+ax4.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
+
+ax4.set_xticks(np.linspace(0, 14, 15))
+# ax1.set_xticks([(-1.5 + i*1.5) for i in range(len(stdDevList_r))])
 plt.tight_layout()
 
 file_pathplot = f"./PM_feb/{caseName}/plot_{Targetfreq}.png"
 plt.savefig(file_pathplot)
 plt.show()
+
+
+plt.figure(figsize=(12, 2))
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_r2))], phaselist_r2, '-', color='black', linewidth=1.5, label='Density perturbations (PM)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_rRef2))], phaselist_rRef2, '--', color='black', linewidth=0.75, label='Density perturbations (Reference)')
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+plt.xlabel('Probe Location(mm)',fontsize=14)
+plt.ylabel('Phase of Density\n Perturbations', fontsize=14, multialignment='center')
+# plt.annotate('w = 100kHz', xy=(0.043, 0.9), xycoords='axes fraction', fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=12)
+
+plt.legend(loc='upper left')
+plt.legend(loc='upper right')
+plt.grid(axis='x')
+plt.yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
+
+plt.xticks(np.linspace(0, 14, 15))
+plt.show()
+
+
+plt.figure(figsize=(12, 2))
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_t2))], phaselist_t2, '-', color='red', linewidth=1.5, label='Temperature perturbations (PM)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_tRef2))], phaselist_tRef2, '--', color='red', linewidth=0.75, label='Temperature perturbations (Reference)')
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+plt.xlabel('Probe Location(mm)',fontsize=14)
+plt.ylabel('Phase of Temperature\n Perturbations', fontsize=14, multialignment='center')
+# plt.annotate('w = 100kHz', xy=(0.043, 0.9), xycoords='axes fraction', fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=12)
+
+plt.legend(loc='upper left')
+plt.legend(loc='upper right')
+plt.grid(axis='x')
+plt.yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
+
+plt.xticks(np.linspace(0, 14, 15))
+plt.show()
+
+
+
+
+plt.figure(figsize=(12, 2))
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_p2))], phaselist_p2, '-', color='blue', linewidth=1.5, label='Pressure perturbations (PM)')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(phaselist_pRef2))], phaselist_pRef2, '--', color='blue', linewidth=0.75, label='Pressure perturbations (Reference)')
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+plt.xlabel('Probe Location(mm)',fontsize=14)
+plt.ylabel('Phase of Pressure\n Perturbations', fontsize=14, multialignment='center')
+# plt.annotate('w = 100kHz', xy=(0.043, 0.9), xycoords='axes fraction', fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=12)
+
+plt.legend(loc='upper left')
+plt.legend(loc='upper right')
+plt.grid(axis='x')
+plt.yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi],
+           ['0', r'$\frac{\pi}{2}$', r'$\pi$', r'$\frac{3\pi}{2}$', r'$2\pi$'])
+
+plt.xticks(np.linspace(0, 14, 15))
+plt.show()
+
+
+
+
+
+plt.figure(figsize=(12, 3))
+plt.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r/np.mean(stdDevList_r), '-', color='gray', linewidth=1, label='Density')
+plt.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t/np.mean(stdDevList_t), '-', color='red', linewidth=1, label='Temperature')
+plt.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p/np.mean(stdDevList_p), '-', color='blue', linewidth=1, label='Pressure')
+# # Plot stdDevList in the bottom subplot
+# ax3_r = ax3.twinx()
+# ax3_r.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_r))], stdDevList_r, '-', color='gray', linewidth=1, label='Density')
+# ax3.plot([(-0.0 + i*15/90)  for i in range(len(stdDevList_t))], stdDevList_t, '-', color='red', linewidth=1, label='Temperature')
+# ax3.plot([(-0.0 + i*15/90) for i in range(len(stdDevList_p))], stdDevList_p, '-', color='blue', linewidth=1, label='Pressure')
+plt.xlabel('Probe Location(mm)',fontsize=14)
+plt.ylabel('Normalized RMS', fontsize=14, multialignment='center')
+# plt.annotate('w = 100kHz', xy=(0.043, 0.9), xycoords='axes fraction', fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=12)
+
+plt.legend(loc='upper left')
+plt.legend(loc='upper right')
+plt.grid(axis='x')
+
+
+plt.xticks(np.linspace(0, 14, 15))
+plt.show()
+
