@@ -55,10 +55,10 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     return amplitude, phase, std_dev
 
 
-caseName = "100hz_at5_edge"
+caseName = "500hzat5"
 # caseName = "ref_edge"
 
-caseNameREF = "ref_edge"
+caseNameREF = "ref"
 # point = 7
 # file_path = f"./PM_BC_december/{caseName}/Point{str(point)}.dat"
 # data = pd.read_csv(file_path, delim_whitespace=True, header=None)
@@ -92,7 +92,7 @@ for point in range(1, 90):
     file_path_ref = f"./PM_feb/{caseNameREF}/PROBE_{str(point)}"
     data = pd.read_csv(file_path, delim_whitespace=True, header=None)
     dataref = pd.read_csv(file_path_ref, delim_whitespace=True, header=None)
-    if(point==40):
+    if(point==43):
         plotflag=True
     else:
         plotflag=False
