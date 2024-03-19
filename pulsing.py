@@ -3,9 +3,19 @@ import matplotlib.pyplot as plt
 
 # Enabling LaTeX formatting in matplotlib
 plt.rcParams.update({
-    "text.usetex": True
+    "text.usetex": True,
+    "font.serif": ["Computer Modern Roman"],
 })
+frequency = 1  # Frequency in Hz
+phase_shift = np.pi / 4  # Phase shift in radians
+time_period = 1 / frequency  # Time period of one cycle
+sampling_rate = 100  # Sampling rate in samples per second
+time = np.linspace(0, 2.5 * time_period, int(2.5 * time_period * sampling_rate), endpoint=False)  # Time vector for 3 periods
 
+# Generating the signals
+signal_1 = np.sin(2 * np.pi * frequency * time)
+signal_2 = np.sin(2 * np.pi * frequency * time - phase_shift)
+signal_3 = np.sin(2 * np.pi * frequency * time - 2 * phase_shift)
 # Given parameters and signals are already defined in the previous code.
 # Recalculate Umin, Umean, and Umax based on new phase_shift
 Umax = max(np.max(signal_1), np.max(signal_2), np.max(signal_3))
@@ -32,7 +42,7 @@ ax1.set_xlabel("Streamwise Position", fontsize=15)
 ax1.set_ylabel("Flow Property U", fontsize=15)
 ax1.legend()
 ax1.set_xlim(left=0)
-
+ax3.tick_params(axis='both', which='major', labelsize=14)
 plt.show()
 
 
@@ -51,7 +61,7 @@ ax2.set_xticks([])
 ax2.set_xlabel("Streamwise Position", fontsize=15)
 ax2.set_ylabel("Phase of\n Perturbations", fontsize=15)
 ax2.set_xlim(left=0)
-
+ax2.tick_params(axis='both', which='major', labelsize=14)
 # # Second subplot
 ax3.plot(time, (time-0.25)%time_period*0, label=r"$T_0$", color="blue", linewidth=2)
 
@@ -68,5 +78,5 @@ ax3.set_xticks([])
 ax3.set_xlabel("Streamwise Position", fontsize=15)
 ax3.set_ylabel("Perturbation\n Amplitude", fontsize=15)
 ax3.set_xlim(left=0)
-
+ax3.tick_params(axis='both', which='major', labelsize=14)
 plt.show()
