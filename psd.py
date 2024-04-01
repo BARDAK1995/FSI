@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
 # Read the file into a DataFrame, assuming space-separated values and no header
-caseName = "35_4mm"
+caseName = "ref_highProbe_Highdensity"
 # caseName = "CASE2"
-point = 33
+point = 40
 # caseName = "case1_2mm"
 # caseName = "oscilatingPM50"
 
-file_path = f"./PM_march/{caseName}/PROBE_{str(point)}"
-file_path2 = f"./PM_march/ref_edge/PROBE_{str(point)}"
+file_path = f"./PM_april/{caseName}/PROBE_{str(point)}"
+file_path2 = f"./PM_april/ref_highProbe_Highdensity/PROBE_{str(point+10)}"
 # file_path2 = f"./PM_BC_december/case1_2mm/Point{str(point)}.dat"
 
 # file_path2 = f"./PM_BC_1/{caseName}/Point{str(point+5)}.dat"
@@ -107,14 +107,14 @@ def plotPSD2(data, data2, probe):
     frequencies2, psd_values2Rho = signal.welch(detrended_data2_rho, fs=samplingFreq, nperseg=100000)
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
-    plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=1, label=f'probe {probe} before Shock') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label=f'probe {probe+10} after Shock') #label='No Jet(Reference State)'
     plt.title('Pressure PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [P**2/Hz]', fontsize=18)
-    plt.xlim([2*10**1, 2*10**5])
+    plt.xlim([2*10**1, 2*10**4])
     # plt.xlim(left=2*10**1)
-    plt.ylim([2*10**-10, 2*10**-5]) # setting y-axis range
+    plt.ylim([5*10**-9, 3*10**-5]) # setting y-axis range
     # plt.ylim(bottom=2*10**-8)
     plt.legend(fontsize=20)
     plt.grid(True)
@@ -123,15 +123,15 @@ def plotPSD2(data, data2, probe):
     plt.show()
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
-    plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=1, label=f'probe {probe} before Shock') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label=f'probe {probe+10} after Shock') #label='No Jet(Reference State)'
     plt.title('Translational Temperature PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [T**2/Hz]', fontsize=18)
-    plt.xlim([2*10**1, 2*10**5])
+    plt.xlim([2*10**1, 2*10**4])
     # plt.ylim(bottom=2*10**-7)
     # plt.xlim(left=2*10**1)
-    plt.ylim([2*10**-10, 2*10**-4]) # setting y-axis range
+    plt.ylim([5*10**-9, 2*10**-3]) # setting y-axis range
     plt.legend(fontsize=20)
     plt.grid(True)
     plt.xticks(fontsize=20)
@@ -139,15 +139,15 @@ def plotPSD2(data, data2, probe):
     plt.show()
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
-    plt.loglog(frequencies/1000, psd_valuesRho,"black",linewidth=3, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
-    plt.loglog(frequencies2/1000, psd_values2Rho,linewidth=1, label='reference') #label='No Jet(Reference State)'
+    plt.loglog(frequencies/1000, psd_valuesRho,"black",linewidth=1, label=f'probe {probe}') #label='Perturbed Flow via Pulsed Jet'
+    plt.loglog(frequencies2/1000, psd_values2Rho,linewidth=1, label='after') #label='No Jet(Reference State)'
     plt.title('Density PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [rho**2/Hz]', fontsize=18)
-    plt.xlim([2*10**1, 2*10**5])
+    plt.xlim([2*10**1, 2*10**4])
     # plt.ylim(bottom=2*10**-8)
     # plt.xlim(left=2*10**1)
-    plt.ylim([10**-10, 5*10**-3]) # setting y-axis range
+    plt.ylim([10**-7, 1*10**-1]) # setting y-axis range
     plt.legend(fontsize=20)
     plt.grid(True)
     plt.xticks(fontsize=20)
@@ -542,7 +542,7 @@ def plotPSD2_jetcomp(data, data2, probe):
     plt.yticks(fontsize=20)
     plt.show()
 # plotPSD(df)
-# plotPSD2(df,df2, point)
+plotPSD2(df,df2, point)
 # plotPSD2_100(df,df2, point)
-plotPSD2_kucuk(df,df2, point)
+# plotPSD2_kucuk(df,df2, point)
 # plotPSD2_jetcomp(df,df2, point)
