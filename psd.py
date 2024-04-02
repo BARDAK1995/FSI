@@ -10,7 +10,7 @@ point = 40
 # caseName = "oscilatingPM50"
 
 file_path = f"./PM_april/{caseName}/PROBE_{str(point)}"
-file_path2 = f"./PM_april/ref_highProbe_Highdensity/PROBE_{str(point+10)}"
+file_path2 = f"./PM_april/ref_highProbe_Highdensity/PROBE_{str(point+2)}"
 # file_path2 = f"./PM_BC_december/case1_2mm/Point{str(point)}.dat"
 
 # file_path2 = f"./PM_BC_1/{caseName}/Point{str(point+5)}.dat"
@@ -108,13 +108,13 @@ def plotPSD2(data, data2, probe):
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
     plt.loglog(frequencies/1000, psd_valuesP,"orange",linewidth=1, label=f'probe {probe} before Shock') #label='Perturbed Flow via Pulsed Jet'
-    plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label=f'probe {probe+10} after Shock') #label='No Jet(Reference State)'
+    plt.loglog(frequencies2/1000, psd_values2P,linewidth=1, label=f'probe {probe+2} after Shock') #label='No Jet(Reference State)'
     plt.title('Pressure PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [P**2/Hz]', fontsize=18)
     plt.xlim([2*10**1, 2*10**4])
     # plt.xlim(left=2*10**1)
-    plt.ylim([5*10**-9, 3*10**-5]) # setting y-axis range
+    plt.ylim([5*10**-9, 3*10**-3]) # setting y-axis range
     # plt.ylim(bottom=2*10**-8)
     plt.legend(fontsize=20)
     plt.grid(True)
@@ -124,14 +124,14 @@ def plotPSD2(data, data2, probe):
     # Plotting the Power Spectral Density
     plt.figure(figsize=(fig_xsize, 6))
     plt.loglog(frequencies/1000, psd_valuesT,"red",linewidth=1, label=f'probe {probe} before Shock') #label='Perturbed Flow via Pulsed Jet'
-    plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label=f'probe {probe+10} after Shock') #label='No Jet(Reference State)'
+    plt.loglog(frequencies2/1000, psd_values2T,linewidth=1, label=f'probe {probe+2} after Shock') #label='No Jet(Reference State)'
     plt.title('Translational Temperature PSD', fontsize=22)
     plt.xlabel('Frequency [kHz]', fontsize=18)
     plt.ylabel('PSD [T**2/Hz]', fontsize=18)
     plt.xlim([2*10**1, 2*10**4])
     # plt.ylim(bottom=2*10**-7)
     # plt.xlim(left=2*10**1)
-    plt.ylim([5*10**-9, 2*10**-3]) # setting y-axis range
+    plt.ylim([5*10**-11, 2*10**-5]) # setting y-axis range
     plt.legend(fontsize=20)
     plt.grid(True)
     plt.xticks(fontsize=20)

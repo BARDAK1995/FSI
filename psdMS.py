@@ -93,10 +93,13 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
         data_of_interest2 = np.array(data2[index_of_interest])
 
         # Detrend and calculate PSD
-        detrended_data = signal.detrend(data_of_interest[len(data_of_interest)//5:])
+        asdasd = len(data_of_interest)//5
+        asdasd = 40000
+
+        detrended_data = signal.detrend(data_of_interest[asdasd:])
         frequencies, psd_values = signal.welch(detrended_data, fs=sampling_freq, nperseg=nperseg)
         
-        detrended_data2 = signal.detrend(data_of_interest2[len(data_of_interest)//5:])
+        detrended_data2 = signal.detrend(data_of_interest2[asdasd:])
         frequencies2, psd_values2 = signal.welch(detrended_data2, fs=sampling_freq, nperseg=nperseg)
 
         # Filter the frequencies and PSD values to match the desired frequency range
@@ -120,11 +123,11 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     
     # Prepare the PSD values for contour plotting
     Z = np.array(all_psd_values)
-    vmin, vmax = -75, -29
+    vmin, vmax =-8, -2
 
-    # Plot
     plt.figure(figsize=(fig_xsize, 6))
-    contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
+    # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
+    contour = plt.contourf(X, Y/1000, (Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
 
     # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
     plt.colorbar(contour)
@@ -134,7 +137,24 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     
     plt.xlabel('Probe Number')
     plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
-    plt.title(f'Contour Plot of Power Spectral Density across Probes {start_probe} to {end_probe}')
+    plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
+    plt.show()
+
+
+    # Plot
+    plt.figure(figsize=(fig_xsize, 6))
+    # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
+    contour = plt.contourf(X, Y/1000, np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
+
+    # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
+    plt.colorbar(contour)
+    
+    # Set the y-axis limits to the desired frequency range
+    plt.ylim(freq_min/1000, freq_max/1000)  # Convert frequency to kHz for the plot
+    
+    plt.xlabel('Probe Number')
+    plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
+    plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
     plt.show()
 
     X2, Y2 = np.meshgrid(range(start_probe, end_probe + 1), all_frequencies2[0])
@@ -144,7 +164,7 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     
     # Plot
     plt.figure(figsize=(fig_xsize, 6))
-    contour = plt.contourf(X2, Y2/1000, 10*np.log10(Z2.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
+    contour = plt.contourf(X2, Y2/1000, np.log10(Z2.T), levels=100, cmap='viridis')  # Convert frequency to kHz
     plt.colorbar(contour)
     
     # Set the y-axis limits to the desired frequency range
@@ -152,13 +172,14 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     
     plt.xlabel('Probe Number')
     plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
-    plt.title(f'Contour Plot of Power Spectral Density across Probes {start_probe} to {end_probe}')
+    plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
     plt.show()
+    return 
 
 
 
 # Call the function with the specified parameters
-plot_all_probes_psd(start_probe=1, end_probe=90, case_name="ref_highProbe_Highdensity",ref_name="ref_highProbe_Highdensity", index_of_interest=13)
+plot_all_probes_psd(start_probe=1, end_probe=98, case_name="100khzat1_30at11_HUGE",ref_name="refHuge", index_of_interest=13)
 
 # # Use the function for your case
 # plot_all_probes_psd(start_probe=1, end_probe=90, case_name="100_15at4_sync", index_of_interest=indext)
