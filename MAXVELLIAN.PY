@@ -11,7 +11,7 @@ dict_elements = {}
 dict_elements["he"] = 4.0026 * amuKg
 dict_elements["N2"] = 2*14 * amuKg
 
-def maxwellian_densityWallSPEED_EPIC(C, m, T,A , k=1.38064852e-23):
+def maxwellian_densityWallSPEED_EPIC_first(C, m, T,A , k=1.38064852e-23):
     B = m / (k*T)
     constant_factor =  B * C
     UglyTerm = (1 - (B*A*C + 1)*np.exp(-B*A*C))/(B*A*A) + (1-np.exp(-B*A*C))
@@ -19,6 +19,18 @@ def maxwellian_densityWallSPEED_EPIC(C, m, T,A , k=1.38064852e-23):
     exponential_factor = np.exp(-B/2 * (C**2 + A**2))
     mean_velocity =0
     mostProbSpeed =0
+    # print(f"Mean speed is {mean_velocity}")
+    # print(f"most prob speed is {mostProbSpeed}")
+    return constant_factor * exponential_factor * UglyTerm, mean_velocity
+
+def maxwellian_densityWallSPEED_EPIC(C, m, T,A , k=1.38064852e-23):
+    B = m / (k*T)
+    constant_factor =  B*B * C*C
+    UglyTerm = (np.exp(A*B*C)*(-A*A*B + A*B*C - 1) + np.exp(A*A*B))/(A*A*B*B*C)
+    # constant_factor = ((m / (2 * np.pi * k * T)) ** 1.5) * 4 * np.pi * v * v
+    exponential_factor = np.exp(-B/2 * (C**2 + A**2))
+    mean_velocity = 0
+    mostProbSpeed = 0
     # print(f"Mean speed is {mean_velocity}")
     # print(f"most prob speed is {mostProbSpeed}")
     return constant_factor * exponential_factor * UglyTerm, mean_velocity
@@ -59,7 +71,7 @@ def maxwellian_probabilityFunc_NORMALVEL(v, m, T, k=1.38064852e-23):
 
 T = 300
 m = dict_elements["N2"]
-unsteadyV = -0.0001
+unsteadyV = -150.5
 A = unsteadyV
 v_values = np.linspace(0, 1400, 1000)  # Generates 1000 points between 0 and 3000
 v_valuesFull = np.linspace(-1400, 1400, 1000)  # Generates 1000 points between 0 and 3000
@@ -143,8 +155,8 @@ plt.show()
 
 
 
-file_path1 = 'PM_BC2\ANAN1_0.fdf'
-file_path2 = 'PM_BC2\ANAN2_0.fdf'
+file_path1 = 'PM_BC2/ANAN1_0.fdf'
+file_path2 = 'PM_BC2/ANAN2_0.fdf'
 df1 = pd.read_csv(file_path1, delim_whitespace=True, header=None)
 df2 = pd.read_csv(file_path2, delim_whitespace=True, header=None)
 # Extract the 3rd column (index 2)
