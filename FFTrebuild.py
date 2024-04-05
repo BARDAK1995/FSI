@@ -58,22 +58,22 @@ def rebuild_signal(data_series, target_freq_hz, timestep_duration, truncate_star
     
     return amplitude, phase, std_dev
 
-caseName = "120undershock_40at0"
+caseName = "100khz_at10_huge"
 # caseName = "ref_edge"
-caseNameREF = "120Undershock"
+caseNameREF = "refHuge"
 # caseNameREF = "100_0_control"
 # caseNameREF = "100khz_at10_huge"
 comparison = "perturbed REF"
 # comparison = "baseline"
 caseNametxt = "PM"
 
-# probeStart, probeEnd = 4, 59.4
-probeStart, probeEnd = 0, 15
-ticks = 16
+probeStart, probeEnd = 4, 59.4
+# probeStart, probeEnd = 0, 15
+ticks = 10
 AmpMax = 7
 Nprobes = 91
-truncateStart = 10000
-truncateEnd = 30000
+truncateStart = 40000
+truncateEnd = 70000
 strlist_p, phaselist_p, stdDevList_p = [], [], []
 strlist_t, phaselist_t, stdDevList_t = [], [], []
 phaselist_pRef, phaselist_tRef, phaselist_rRef = [], [], []

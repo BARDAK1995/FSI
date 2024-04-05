@@ -128,13 +128,10 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     plt.figure(figsize=(fig_xsize, 6))
     # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
     contour = plt.contourf(X, Y/1000, (Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
-
     # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
     plt.colorbar(contour)
-    
     # Set the y-axis limits to the desired frequency range
     plt.ylim(freq_min/1000, freq_max/1000)  # Convert frequency to kHz for the plot
-    
     plt.xlabel('Probe Number')
     plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
     plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
@@ -145,31 +142,34 @@ def plot_all_probes_psd(start_probe, end_probe, case_name, ref_name, index_of_in
     plt.figure(figsize=(fig_xsize, 6))
     # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis')  # Convert frequency to kHz
     contour = plt.contourf(X, Y/1000, np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
-
     # contour = plt.contourf(X, Y/1000, 10*np.log10(Z.T), levels=100, cmap='viridis', vmin=vmin, vmax=vmax)  # Convert frequency to kHz
     plt.colorbar(contour)
-    
     # Set the y-axis limits to the desired frequency range
     plt.ylim(freq_min/1000, freq_max/1000)  # Convert frequency to kHz for the plot
-    
     plt.xlabel('Probe Number')
     plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
     plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
     plt.show()
 
     X2, Y2 = np.meshgrid(range(start_probe, end_probe + 1), all_frequencies2[0])
-    
     # Prepare the PSD values for contour plotting
     Z2 = np.array(all_psd_values2)
-    
     # Plot
     plt.figure(figsize=(fig_xsize, 6))
-    contour = plt.contourf(X2, Y2/1000, np.log10(Z2.T), levels=100, cmap='viridis')  # Convert frequency to kHz
+    contour = plt.contourf(X2, Y2/1000, (Z2.T), levels=100, cmap='viridis')  # Convert frequency to kHz
     plt.colorbar(contour)
-    
     # Set the y-axis limits to the desired frequency range
     plt.ylim(freq_min/1000, freq_max/1000)  # Convert frequency to kHz for the plot
-    
+    plt.xlabel('Probe Number')
+    plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
+    plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')
+    plt.show()
+    #+=============================================================================================
+    plt.figure(figsize=(fig_xsize, 6))
+    contour = plt.contourf(X2, Y2/1000, np.log10(Z2.T), levels=100, cmap='viridis',vmin=vmin, vmax=vmax)  # Convert frequency to kHz
+    plt.colorbar(contour)
+    # Set the y-axis limits to the desired frequency range
+    plt.ylim(freq_min/1000, freq_max/1000)  # Convert frequency to kHz for the plot
     plt.xlabel('Probe Number')
     plt.ylabel('Frequency [kHz]')  # Make sure to label the units correctly as kHz
     plt.title(f'PSD - {case_name} across Probes {start_probe} to {end_probe}')

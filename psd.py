@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from scipy import signal
 import numpy as np
 # Read the file into a DataFrame, assuming space-separated values and no header
-caseName = "ref_highProbe_Highdensity"
+caseName = "100_15at4_sync"
 # caseName = "CASE2"
 point = 40
 # caseName = "case1_2mm"
 # caseName = "oscilatingPM50"
 
 file_path = f"./PM_april/{caseName}/PROBE_{str(point)}"
-file_path2 = f"./PM_april/ref_highProbe_Highdensity/PROBE_{str(point+2)}"
+file_path2 = f"./PM_april/ref_edge/PROBE_{str(point)}"
 # file_path2 = f"./PM_BC_december/case1_2mm/Point{str(point)}.dat"
 
 # file_path2 = f"./PM_BC_1/{caseName}/Point{str(point+5)}.dat"

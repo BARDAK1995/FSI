@@ -11,6 +11,18 @@ dict_elements = {}
 dict_elements["he"] = 4.0026 * amuKg
 dict_elements["N2"] = 2*14 * amuKg
 
+def maxwellian_densityWallSPEED_EPIC(C, m, T,A , k=1.38064852e-23):
+    B = m / (k*T)
+    constant_factor =  B * C
+    UglyTerm = (1 - (B*A*C + 1)*np.exp(-B*A*C))/(B*A*A) + (1-np.exp(-B*A*C))
+    # constant_factor = ((m / (2 * np.pi * k * T)) ** 1.5) * 4 * np.pi * v * v
+    exponential_factor = np.exp(-B/2 * (C**2 + A**2))
+    mean_velocity =0
+    mostProbSpeed =0
+    # print(f"Mean speed is {mean_velocity}")
+    # print(f"most prob speed is {mostProbSpeed}")
+    return constant_factor * exponential_factor * UglyTerm, mean_velocity
+
 def maxwellian_densityWall(v, m, T, k=1.38064852e-23):
     # constant_factor = ((m / (2 * np.pi * k * T)) ** 1.5) * 4 * np.pi * v * v
     constant_factor = (1/2) * (m / ( k * T))**2  * (v**3) 
@@ -45,14 +57,19 @@ def maxwellian_probabilityFunc_NORMALVEL(v, m, T, k=1.38064852e-23):
     print(f"most common speed is {mostProbSpeed}")
     return constant_factor * exponential_factor, mostProbSpeed
 
-T = 300 
+T = 300
 m = dict_elements["N2"]
-unsteadyV = 34.56
-
+unsteadyV = -0.0001
+A = unsteadyV
 v_values = np.linspace(0, 1400, 1000)  # Generates 1000 points between 0 and 3000
 v_valuesFull = np.linspace(-1400, 1400, 1000)  # Generates 1000 points between 0 and 3000
 
 Speed_values, mean_VelocityS = maxwellian_densityWall(v_values, m, T)
+
+Speed_valuesMinus, mean_VelocityS = maxwellian_densityWallSPEED_EPIC(v_values, m, T,A)
+Speed_valuesPlus, mean_VelocityS = maxwellian_densityWallSPEED_EPIC(v_values, m, T,-A)
+
+
 V_normalValues, mean_Velocity = maxwellian_probabilityFunc_NORMALVEL(v_values, m, T)
 
 V_tangentValues, mean_Velocityt = maxwellian_density1D(v_valuesFull, m, T)
@@ -254,4 +271,98 @@ plt.xlabel('velocity(m/s)', fontsize=18)  # Increased fontsize
 plt.ylabel('Probability', fontsize=18)  # Increased fontsize
 plt.title('Probability Distribution Functions', fontsize=20)  # Increased fontsize
 plt.legend(fontsize=14)  # Increased fontsize
+plt.show()
+
+
+plt.figure(figsize=(10, 6))
+# plt.hist(Vnormal_1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
+plt.plot(v_values, Speed_values, label='Reflected Particle SPEED', linewidth=1, color='black')  # Increased linewidth
+plt.plot(v_values, Speed_valuesPlus, label='Tangential Velocity', linewidth=1, color='red')  # Increased linewidth
+plt.plot(v_values, Speed_valuesMinus, label='Normal Velocity', linewidth=1, color='blue')  # Increased linewidth
+
+plt.xlabel('velocity(m/s)', fontsize=18)  # Increased fontsize
+plt.ylabel('Probability', fontsize=18)  # Increased fontsize
+plt.title('Probability Distribution Functions', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=14)  # Increased fontsize
+plt.show()
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(v_values, Speed_values, label='$f(C)$', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
+plt.plot(v_values, Speed_valuesMinus, label='$f(C^{PM})^{-} \mapsto C^{PM} = C - A$', linewidth=3, color='red')
+plt.plot(v_values, Speed_valuesPlus, label='$f(C^{PM})^{+} \mapsto  C^{PM} = C + A$', linewidth=3, color='blue')
+
+plt.xlabel('Reflected Speed $C$ (m/s)', fontsize=20)  # Increased fontsize
+plt.ylabel('Probability $f(C)$', fontsize=20)  # Increased fontsize
+plt.title('PM Modified Speed Probability Distribution', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=20)  # Increased fontsize
+plt.grid(True)  
+plt.tick_params(axis='both', which='major', labelsize=14)  # Increased tick label size
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))  # y-axis in scientific notation
+plt.xlim(0, 1400)
+plt.ylim(0,0.0022)
+plt.show()
+# plt.tight_layout()
+plt.show()
+
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(v_values, Speed_values, label='$f(C)$', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
+plt.plot(v_values, Speed_valuesMinus, label='$f(C^{PM})^{-} \mapsto C^{PM} = C - A$', linewidth=3, color='red')
+plt.plot(v_values, Speed_valuesPlus, label='$f(C^{PM})^{+} \mapsto  C^{PM} = C + A$', linewidth=3, color='blue')
+plt.hist(Speed_1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
+
+plt.xlabel('Reflected Speed $C$ (m/s)', fontsize=20)  # Increased fontsize
+plt.ylabel('Probability $f(C)$', fontsize=20)  # Increased fontsize
+plt.title('PM Modified Speed Probability Distribution', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=20)  # Increased fontsize
+plt.grid(True)  
+plt.tick_params(axis='both', which='major', labelsize=14)  # Increased tick label size
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))  # y-axis in scientific notation
+plt.xlim(0, 1400)
+plt.ylim(0,0.0022)
+plt.show()
+# plt.tight_layout()
+plt.show()
+
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(v_values, Speed_values, label='$f(C)$', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
+#plt.plot(v_values, Speed_valuesMinus, label='$f(C^{PM})^{-} \mapsto C^{PM} = C - A$', linewidth=3, color='red')
+plt.plot(v_values, Speed_valuesPlus, label='$f(C^{PM})^{+} \mapsto  C^{PM} = C + A$', linewidth=3, color='blue')
+plt.hist(Speed_1, bins=50,density=True,color='blue', edgecolor='black',alpha=0.5, label='Vmax')
+
+plt.xlabel('Reflected Speed $C$ (m/s)', fontsize=20)  # Increased fontsize
+plt.ylabel('Probability $f(C)$', fontsize=20)  # Increased fontsize
+plt.title('PM Modified Speed Probability Distribution', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=20)  # Increased fontsize
+plt.grid(True)  
+plt.tick_params(axis='both', which='major', labelsize=14)  # Increased tick label size
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))  # y-axis in scientific notation
+plt.xlim(0, 1400)
+plt.ylim(0,0.0022)
+plt.show()
+# plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(12, 6))
+plt.plot(v_values, Speed_values, label='$f(C)$', linewidth=3, color='black', linestyle='dotted')  # Increased linewidth
+plt.plot(v_values, Speed_valuesMinus, label='$f(C^{PM})^{-} \mapsto C^{PM} = C - A$', linewidth=3, color='red')
+#plt.plot(v_values, Speed_valuesPlus, label='$f(C^{PM})^{+} \mapsto  C^{PM} = C + A$', linewidth=3, color='blue')
+plt.hist(Speed_2, bins=50,density=True,color='red', edgecolor='black',alpha=0.5, label='Vmin')
+
+plt.xlabel('Reflected Speed $C$ (m/s)', fontsize=20)  # Increased fontsize
+plt.ylabel('Probability $f(C)$', fontsize=20)  # Increased fontsize
+plt.title('PM Modified Speed Probability Distribution', fontsize=20)  # Increased fontsize
+plt.legend(fontsize=20)  # Increased fontsize
+plt.grid(True)  
+plt.tick_params(axis='both', which='major', labelsize=14)  # Increased tick label size
+plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))  # y-axis in scientific notation
+#plt.xlim(0, 1400)
+#plt.ylim(0,0.0022)
+plt.show()
+# plt.tight_layout()
 plt.show()
